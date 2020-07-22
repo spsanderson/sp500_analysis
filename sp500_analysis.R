@@ -45,6 +45,8 @@ asset_returns_long <- pivot_longer(
     ) %>%
     drop_na()
 
+write_rds(x = asset_returns_long, "asset_returns_long.rds")
+
 asset_returns_long %>%
     ggplot(
         mapping = aes(
