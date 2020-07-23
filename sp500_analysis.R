@@ -15,6 +15,9 @@ pacman::p_load(
 # Get SP500 Index ---------------------------------------------------------
 
 sp500_co_data_tbl <- tq_index("SP500")
+symbol_sector <- sp500_co_data_tbl %>%
+    distinct(symbol, sector)
+
 sp500_prices_tbl  <- tq_get(x = sp500_co_data_tbl$symbol)
 sp500_tbl <- sp500_prices_tbl %>%
     left_join(sp500_co_data_tbl, by = c("symbol"="symbol"))
@@ -46,13 +49,28 @@ asset_returns_long <- pivot_longer(
     drop_na()
 
 write_rds(x = asset_returns_long, "asset_returns_long.rds")
+asset_returns_long <- read_rds("asset_returns_long.rds")
 
 asset_returns_long %>%
+    filter(!symbol == "TT") %>%
+    left_join(symbol_sector, by = c("symbol" = "symbol")) %>%
     ggplot(
         mapping = aes(
             x = date
             , y = returns
             , group = symbol
+            , color = sector
         )
     ) +
-    geom_line()
+    geom_line() +
+    facet_wrap(~ sector)
+
+asset_returns_long %>%
+    filter(!symbol == "TT") %>%
+    ggplot(
+        mapping = aes(
+            x = returns
+            , group = symbol
+        )
+    ) +
+    geom_density()
