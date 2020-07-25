@@ -186,3 +186,15 @@ mean_ret_by_sector_tbl %>%
     theme_update(plot.title = element_text(hjust = 0.5)) +
     theme_tq() +
     scale_color_tq()
+
+
+# Risk --------------------------------------------------------------------
+
+portfolio_sd_tidyquant_builtin_percent <-
+    portfolio_returns_tq_rebalanced_monthly %>%
+    tq_performance(Ra = returns,
+                   Rb = NULL,
+                   performance_fun = table.Stats) %>%
+    select(Stdev) %>%
+    mutate(tq_sd = round(Stdev, 4) * 100)
+
