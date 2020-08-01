@@ -23,6 +23,48 @@ sectors <- unique(sp500_co_data_tbl$sector) %>% as_tibble()
 # Load data if exists
 if(fs::file_exists("asset_returns_long.rds")) {
     asset_returns_long <- read_rds("asset_returns_long.rds")
+    
+    # Add data if needed
+    td <- Sys.Date() %>% lubridate::as_date()
+    md <- max(asset_returns_long$date)
+    if(md < td) {
+        asset_tmp <- tq_get(
+            x = sp500_co_data_tbl$symbol
+            , from = md + ddays(1)
+        )
+        
+        # Get Returns in Long format
+        asset_tmp_ret <- asset_tmp %>%
+            select(symbol, date, adjusted) %>%
+            group_by(symbol) %>%
+            tq_transmute(
+                mutate_fun = periodReturn
+                , period = "monthly"
+                , type = "log"
+                , col_rename = "returns"
+            ) %>%
+            pivot_wider(
+                names_from = symbol
+                , values_from = returns
+            ) %>%
+            slice(-1)
+        
+        asset_tmp_long <- pivot_longer(
+            data = asset_tmp_ret
+            , cols = -date
+            , names_to = "symbol"
+            , values_to = "returns"
+        ) %>%
+            drop_na()
+        
+        # Union Data together
+        asset_returns_long <- asset_returns_long %>%
+            union(asset_tmp_long)
+        
+        # Write file out
+        write_rds(x = asset_returns_long, "asset_returns_long.rds")
+    }
+
 } else {
     
     # if file dne then get
