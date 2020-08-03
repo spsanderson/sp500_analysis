@@ -111,8 +111,6 @@ if(fs::file_exists("asset_history.rds")) {
     asset_returns_long <- read_rds("asset_returns_long.rds")
 }
 
-
-
 # Initial Vizualizations --------------------------------------------------
 
 
