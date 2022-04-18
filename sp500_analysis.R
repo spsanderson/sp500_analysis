@@ -10,6 +10,8 @@ pacman::p_load(
     , "tidyverse"
     , "lubridate"
     , "fs"
+    , "fst"
+    , "arrow"
 )
 
 
