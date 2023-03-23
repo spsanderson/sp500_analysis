@@ -12,6 +12,7 @@ pacman::p_load(
     , "fs"
     , "fst"
     , "arrow"
+    , "data.table"
 )
 
 
